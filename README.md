@@ -1,8 +1,7 @@
 # FixFlow - Field Service Management (SaaS)
 
 > Note: This repository is currently under active development.
-
-> Note: This credentials inside docker-compose.yml are dummy passwords intended strictly for local development and testing.
+> Note: The credentials inside docker-compose.yml are dummy passwords intended strictly for local development and testing.
 
 ## Project Overview
 FixFlow is a comprehensive Software as a Service (SaaS) platform engineered to orchestrate field operations, manage work orders, and establish a reliable technological bridge between centralized administration and deployed technicians. 
@@ -11,36 +10,46 @@ This repository serves as a public technical showcase of the core architecture a
 
 ## Core Architecture & Tech Stack
 
-The system is built upon a distributed architecture, emphasizing scalability, data security, and resilience in low-connectivity environments.
+The system is built upon a highly cohesive **N-Tier Architecture utilizing the Facade and Service patterns**. This design allows us to share business orchestration seamlessly across different presentation layers (Web and API) while maintaining strict dependency rules enforced by automated architecture tests.
 
 ### Backend & Cloud
-* **Framework:** .NET 10 / ASP.NET Core Web API
+* **Framework:** .NET 10 / ASP.NET Core
+* **Architecture Pattern:** Controller-Facade-Service (N-Tier)
 * **ORM:** Entity Framework Core
-* **Database:** Relational SQL Database (Multi-Tenant Architecture)
-* **Authentication:** JWT (JSON Web Tokens) with Role-Based Access Control (RBAC)
+* **Database:** Relational SQL Database (PostgreSQL/SQL Server - Multi-Tenant Architecture)
 * **Deployment:** Containerized via Docker, orchestrated on a Linux VPS with a Reverse Proxy.
+* **CI/CD & Quality:** GitHub Actions with xUnit (Unit Testing) and NetArchTest (Architecture enforcement).
 
-### Mobile Client
+### Web Administration Portal
+* **Framework:** ASP.NET Core (Blazor / MVC)
+* **Architecture Integration:** Direct Dependency Injection of Facades (Bypassing HTTP API for zero-latency server-side rendering).
+* **Authentication:** Secure Cookie-based Authentication with Role-Based Access Control (RBAC).
+
+### Mobile Client (Field Technicians)
 * **Framework:** .NET MAUI (Multi-platform App UI)
 * **Target Platforms:** Android
+* **Communication:** RESTful API consumption secured by JWT.
 * **Local Storage:** SQLite
 * **Features:** Native hardware integration (Camera API for evidence capture, touch events for digital signatures).
 
 ## Key Technical Features
 
-### 1. Logical Multi-Tenancy
+### 1. Unified Facade Orchestration
+To support both a server-rendered Web Portal and a native MAUI application, the backend isolates business workflows inside a `Facade` layer. The Web application injects these Facades directly via DI (eliminating internal HTTP network hops), while the API layer wraps the same Facades to serve the mobile client via REST and JWT. 
+
+### 2. Logical Multi-Tenancy
 The backend is designed to support multiple contractor companies (Tenants) within a single database instance without data leakage. This is achieved through strict logical isolation using `TenantId` foreign keys and the implementation of **Global Query Filters** at the Entity Framework Core level, ensuring all database transactions inherently respect tenant boundaries.
 
-### 2. Offline-First Synchronization
+### 3. Offline-First Synchronization
 Field technicians frequently operate in areas with zero network coverage. The mobile application utilizes a local SQLite database to store assigned work orders and capture operational evidence (images, signatures). A custom synchronization algorithm, based on timestamps and atomic transactions, ensures data integrity and resolves conflicts once network connectivity is restored.
 
-### 3. Inbound API Integration
+### 4. Inbound API Integration
 The platform acts as a central hub and includes dedicated, secure RESTful endpoints designed to ingest work orders generated from external third-party CRM and ERP systems, allowing seamless operational continuity for enterprise clients.
 
 ## System Workflow
-1. **Ingestion:** External systems or internal administrators generate Work Orders.
+1. **Ingestion:** External systems or internal administrators (via Web Portal) generate Work Orders.
 2. **Dispatch:** Orders are assigned and pushed to specific technicians.
-3. **Execution (Offline/Online):** Technicians receive tasks, update statuses, and collect audit data via the mobile application.
+3. **Execution (Offline/Online):** Technicians receive tasks, update statuses, and collect audit data via the MAUI application.
 4. **Synchronization:** Data is synced back to the central server, updating the administrative dashboard in real-time.
 
 ## Disclaimer
