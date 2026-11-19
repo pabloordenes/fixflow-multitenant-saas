@@ -1,4 +1,5 @@
-﻿using FixFlow.Shared.Interfaces;
+﻿using FixFlow.Shared.Enums;
+using FixFlow.Shared.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
