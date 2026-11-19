@@ -47,9 +47,7 @@
                             <Entry Placeholder="Correo"
                                    Text="{Binding Email}"
                                    TextColor="#E5E7EB" 
-                                   PlaceholderColor="#808080" 
-                                   InputTransparent="True"
-                                   />
+                                   PlaceholderColor="#808080" />
                         </Border>
 
                         <Border StrokeShape="RoundRectangle 5" StrokeThickness="0.5"
@@ -88,6 +86,12 @@
                                        IsVisible="{Binding IsBusy}"
                                        Color="Black"
                                        HorizontalOptions="Center" />
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="#FF6B6B"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,5,0,0" />
                 </VerticalStackLayout>
             </Grid>
         </Grid>

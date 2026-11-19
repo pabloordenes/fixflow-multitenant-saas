@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using FixFlow.Shared.Enums;
 
 namespace FixFlow.Shared.Dtos.WorkOrders;
 
@@ -12,7 +10,7 @@ public record UpdateWorkOrderDto
 
     public string? Description { get; init; }
 
-    // public WorkOrderStatus Status { get; init; }
+    public WorkOrderStatus Status { get; init; }
 
     public byte[] RowVersion { get; init; } = Array.Empty<byte>();
 }

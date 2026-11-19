@@ -1,17 +1,10 @@
-﻿namespace FixFlow.API.Entities.WorkOrderModels
+﻿using FixFlow.Shared.Enums;
+using FixFlow.Shared.Interfaces;
+
+namespace FixFlow.API.Entities.WorkOrderModels
 {
-
-    public enum AttachmentType
+    public class WorkOrderAttachment : IMustHaveTenant
     {
-        PhotoBefore = 0,
-        PhotoDuring = 1,
-        PhotoAfter = 2,
-        ClientSignature = 3,
-        Document = 4
-    }
-    public class WorkOrderAttachment
-    {
-
         public Guid Id { get; set; }
         public required string FileUri { get; set; }
         public AttachmentType Type { get; set; }

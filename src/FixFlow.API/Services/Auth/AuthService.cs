@@ -1,5 +1,6 @@
 ﻿using FixFlow.API.Data;
 using FixFlow.API.Interfaces.Auth;
+using FixFlow.Shared.Constants;
 using FixFlow.Shared.Dtos.Auth.Login;
 using FixFlow.Shared.Dtos.Auth.Register;
 using FixFlow.Shared.Dtos.Common;
@@ -96,7 +97,7 @@ namespace FixFlow.API.Services.Auth
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("tenantId", user.TenantId.ToString()),
+                new Claim(CustomClaimTypes.TenantId, user.TenantId.ToString()),
                 new Claim(ClaimTypes.Role, user.Role!)
             };
             var token = new JwtSecurityToken(
