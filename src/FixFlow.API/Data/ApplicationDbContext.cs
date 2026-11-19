@@ -3,7 +3,6 @@ using FixFlow.API.Entities.WorkOrderModels;
 using FixFlow.API.Services.Tenant;
 using FixFlow.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace FixFlow.API.Data;
 
@@ -74,21 +73,65 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Customer>()
             .HasIndex(c => new { c.TenantId, c.Rut })
             .IsUnique();
+    }
 
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        ApplyTenantRules();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
+    {
+        ApplyTenantRules();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    private void ApplyTenantRules()
+    {
+        var currentTenantId = _currentTenantService.TenantId;
+        if (currentTenantId == Guid.Empty)
         {
-            // Revisamos si la entidad implementa IMustHaveTenant
-            if (typeof(IMustHaveTenant).IsAssignableFrom(entityType.ClrType))
-            {
-                var parameter = Expression.Parameter(entityType.ClrType, "e");
-                var body = Expression.Equal(
-                    Expression.Property(parameter, nameof(IMustHaveTenant.TenantId)),
-                    Expression.Property(Expression.Constant(_currentTenantService), nameof(ICurrentTenantService.TenantId))
-                );
-                var filter = Expression.Lambda(body, parameter);
+            // Anonymous flows (e.g., tenant registration, startup seeding) provide explicit TenantId values.
+            return;
+        }
 
-                // Aplicamos el filtro global dinámicamente
-                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(filter);
+        ChangeTracker.DetectChanges();
+
+        foreach (var entry in ChangeTracker.Entries<IMustHaveTenant>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.TenantId = currentTenantId;
+                    break;
+
+                case EntityState.Modified:
+                {
+                    var originalTenantId = entry.OriginalValues.GetValue<Guid>(nameof(IMustHaveTenant.TenantId));
+                    var tenantProperty = entry.Property(nameof(IMustHaveTenant.TenantId));
+
+                    if (originalTenantId != currentTenantId ||
+                        (tenantProperty.IsModified && entry.Entity.TenantId != currentTenantId))
+                    {
+                        throw new UnauthorizedAccessException("Cross-tenant modification is not permitted.");
+                    }
+
+                    tenantProperty.IsModified = false;
+                    break;
+                }
+
+                case EntityState.Deleted:
+                {
+                    var deletedTenantId = entry.OriginalValues.GetValue<Guid>(nameof(IMustHaveTenant.TenantId));
+                    if (deletedTenantId != currentTenantId)
+                    {
+                        throw new UnauthorizedAccessException("Cross-tenant deletion is not permitted.");
+                    }
+                    break;
+                }
             }
         }
     }

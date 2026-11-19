@@ -1,4 +1,6 @@
-﻿namespace FixFlow.API.Entities.WorkOrderModels
+﻿using FixFlow.Shared.Interfaces;
+
+namespace FixFlow.API.Entities.WorkOrderModels
 {
 
     public enum AttachmentType
@@ -9,7 +11,7 @@
         ClientSignature = 3,
         Document = 4
     }
-    public class WorkOrderAttachment
+    public class WorkOrderAttachment : IMustHaveTenant
     {
 
         public Guid Id { get; set; }

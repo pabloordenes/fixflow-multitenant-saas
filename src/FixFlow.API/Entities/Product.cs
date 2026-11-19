@@ -1,8 +1,9 @@
 ﻿using FixFlow.API.Entities.WorkOrderModels;
+using FixFlow.Shared.Interfaces;
 
 namespace FixFlow.API.Entities;
 
-public class Product
+public class Product : IMustHaveTenant
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }

@@ -1,6 +1,8 @@
-﻿namespace FixFlow.API.Entities.WorkOrderModels
+﻿using FixFlow.Shared.Interfaces;
+
+namespace FixFlow.API.Entities.WorkOrderModels
 {
-    public class WorkOrderProduct
+    public class WorkOrderProduct : IMustHaveTenant
     {
         public Guid Id { get; set; }
 

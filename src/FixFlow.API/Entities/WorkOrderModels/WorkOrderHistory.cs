@@ -1,6 +1,8 @@
-﻿namespace FixFlow.API.Entities.WorkOrderModels
+﻿using FixFlow.Shared.Interfaces;
+
+namespace FixFlow.API.Entities.WorkOrderModels
 {
-    public class WorkOrderHistory
+    public class WorkOrderHistory : IMustHaveTenant
     {
         public Guid Id { get; set; }
         public required string PreviousStatus { get; set; }
