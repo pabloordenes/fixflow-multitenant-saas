@@ -17,9 +17,9 @@ public sealed class SqliteTestDbContext : ApplicationDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // SQLite does not auto-generate SQL Server rowversion byte[] values on INSERT.
+        // SQLite does not provide PostgreSQL's xmin system column auto-generation on INSERT.
         modelBuilder.Entity<WorkOrder>()
-            .Property(w => w.RowVersion)
-            .HasDefaultValue(new byte[] { 1, 0, 0, 0, 0, 0, 0, 0 });
+            .Property(w => w.Version)
+            .HasDefaultValue(1u);
     }
 }
