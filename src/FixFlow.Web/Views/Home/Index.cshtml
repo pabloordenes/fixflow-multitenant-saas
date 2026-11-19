@@ -35,8 +35,8 @@
             btnSubmit.innerHTML = 'PROCESANDO SOLICITUD...';
 
             try {
-                // 1. URL limpia sin barra al final. (ASEGÚRATE QUE SEA EL PUERTO DE LA API, NO DEL WEB)
-                const API_BASE_URL = 'https://rknzgfng-7016.brs.devtunnels.ms';
+                // 1. URL limpia sin barra al final, cargada desde configuración (ApiSettings:BaseUrl)
+                const API_BASE_URL = '@ViewData["ApiBaseUrl"]';
 
                 const response = await fetch(`${API_BASE_URL}/api/Auth/login`, {
                     method: 'POST',
