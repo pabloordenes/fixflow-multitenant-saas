@@ -8,6 +8,8 @@ namespace FixFlow.API.Data;
 
 public class ApplicationDbContext : DbContext
 {
+    public const string DefaultSchema = "fixflow";
+
     private readonly ICurrentTenantService _currentTenantService;
 
     public ApplicationDbContext(
@@ -29,6 +31,8 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.HasDefaultSchema(DefaultSchema);
 
         // --- 1. RELACIONES GLOBALES Y RESTRICCIONES (Restrict) ---
         modelBuilder.Entity<User>().HasOne(u => u.Tenant).WithMany(t => t.Users).HasForeignKey(u => u.TenantId).OnDelete(DeleteBehavior.Restrict);
@@ -53,12 +57,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<WorkOrderHistory>().HasOne(wh => wh.ChangedByUser).WithMany().HasForeignKey(wh => wh.ChangedByUserId).OnDelete(DeleteBehavior.Restrict);
 
         // --- 4. MAPEO DE TIPOS Y CONCURRENCIA ---
-        modelBuilder.Entity<Product>().Property(p => p.Price).HasColumnType("decimal(18,2)");
-        modelBuilder.Entity<WorkOrderProduct>().Property(wi => wi.Quantity).HasColumnType("decimal(18,2)");
-        modelBuilder.Entity<WorkOrderProduct>().Property(wi => wi.UnitPriceAtTimeOfUse).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Product>().Property(p => p.Price).HasPrecision(18, 2);
+        modelBuilder.Entity<WorkOrderProduct>().Property(wi => wi.Quantity).HasPrecision(18, 2);
+        modelBuilder.Entity<WorkOrderProduct>().Property(wi => wi.UnitPriceAtTimeOfUse).HasPrecision(18, 2);
         modelBuilder.Entity<WorkOrder>().Property(w => w.Status).HasConversion<string>();
         modelBuilder.Entity<WorkOrderAttachment>().Property(wa => wa.Type).HasConversion<string>();
-        modelBuilder.Entity<WorkOrder>().Property(w => w.RowVersion).IsRowVersion();
+        modelBuilder.Entity<WorkOrder>().Property(w => w.Version).IsRowVersion();
 
         // --- 5. AISLAMIENTO MULTI-TENANT (El Muro de Seguridad) ---
         modelBuilder.Entity<User>().HasQueryFilter(x => x.TenantId == _currentTenantService.TenantId);

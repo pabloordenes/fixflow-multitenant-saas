@@ -39,7 +39,7 @@ public class WorkOrder : IMustHaveTenant
     [ForeignKey("AssignedTechnicianId")]
     public User? AssignedTechnician { get; set; }
 
-    public byte[] RowVersion { get; set; } = null!;
+    public uint Version { get; set; }
 
     public ICollection<WorkOrderProduct> Products { get; set; } = [];
     public ICollection<WorkOrderAttachment> Attachments { get; set; } = [];

@@ -12,5 +12,5 @@ public record UpdateWorkOrderDto
 
     public WorkOrderStatus Status { get; init; }
 
-    public byte[] RowVersion { get; init; } = Array.Empty<byte>();
+    public uint Version { get; init; }
 }
