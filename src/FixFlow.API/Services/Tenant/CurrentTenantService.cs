@@ -1,26 +1,27 @@
-﻿namespace FixFlow.API.Services.Tenant
+﻿using FixFlow.Shared.Constants;
+
+namespace FixFlow.API.Services.Tenant;
+
+public interface ICurrentTenantService
 {
+    Guid TenantId { get; }
+}
 
-    public interface ICurrentTenantService
+public class CurrentTenantService : ICurrentTenantService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public CurrentTenantService(IHttpContextAccessor httpContextAccessor)
     {
-        Guid TenantId { get; }
+        _httpContextAccessor = httpContextAccessor;
     }
-    public class CurrentTenantService : ICurrentTenantService
+
+    public Guid TenantId
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public CurrentTenantService(IHttpContextAccessor httpContextAccessor)
+        get
         {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public Guid TenantId
-        {
-            get
-            {
-                var tenantClaim = _httpContextAccessor.HttpContext?.User.FindFirst("TenantId")?.Value;
-                return string.IsNullOrEmpty(tenantClaim) ? Guid.Empty : Guid.Parse(tenantClaim);
-            }
+            var tenantClaim = _httpContextAccessor.HttpContext?.User.FindFirst(CustomClaimTypes.TenantId)?.Value;
+            return Guid.TryParse(tenantClaim, out var tenantId) ? tenantId : Guid.Empty;
         }
     }
 }
