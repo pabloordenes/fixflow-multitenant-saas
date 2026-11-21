@@ -1,5 +1,4 @@
-﻿using Azure;
-using FixFlow.API.Interfaces.Auth;
+﻿using FixFlow.API.Interfaces.Auth;
 using FixFlow.Shared.Dtos.Auth.Login;
 using FixFlow.Shared.Dtos.Auth.Register;
 using Microsoft.AspNetCore.Authorization;

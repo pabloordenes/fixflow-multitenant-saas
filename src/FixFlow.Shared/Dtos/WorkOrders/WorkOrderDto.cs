@@ -18,5 +18,5 @@ public record WorkOrderDto
 
     public string TechnicianId { get; init; } = string.Empty; //define que tecnico tiene asignada la orden
 
-    public byte[] RowVersion { get; init; } = Array.Empty<byte>();
+    public uint Version { get; init; }
 }
